@@ -1,0 +1,183 @@
+@define-color ink #554c5d;
+@define-color muted #8c7e8d;
+@define-color paper rgba(255, 246, 239, 0.91);
+@define-color line rgba(143, 122, 146, 0.58);
+@define-color lilac #dad5e7;
+@define-color rose #eed2d0;
+@define-color yellow #eee2b4;
+
+* {
+  font-family: "3270 Nerd Font Mono", "Noto Sans Mono";
+  font-size: 16px;
+  font-weight: 500;
+  min-height: 0;
+  border: none;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+window#waybar {
+  background: transparent;
+  color: @ink;
+}
+
+.modules-left,
+.modules-right {
+  background: @paper;
+  border: 1px solid @line;
+  border-radius: 7px;
+  padding: 2px 6px;
+}
+
+.modules-left{
+  border-top-left-radius: 20px;
+}
+
+.modules-right{
+  border-top-right-radius: 20px;
+}
+
+#custom-launcher {
+  font-size: 16px;
+  color: #9b738c;
+  padding: 0 9px 0 3px;
+  margin-right: 5px;
+  border-right: 1px solid @line;
+}
+
+#workspaces button {
+  color: @muted;
+  background: transparent;
+  border-radius: 4px;
+  padding: 0 7px;
+  margin: 1px 1px;
+}
+
+#workspaces button.focused,
+#workspaces button.active {
+  color: @ink;
+  background: @lilac;
+}
+
+#workspaces button.urgent {
+  color: @ink;
+  background: @rose;
+}
+
+#workspaces button:hover,
+#custom-launcher:hover {
+  background: @yellow;
+  color: @ink;
+}
+
+#window {
+  color: @muted;
+  padding: 0 4px 0 11px;
+  margin-left: 5px;
+  border-left: 1px solid @line;
+}
+
+#clock {
+  color: @ink;
+  padding: 0 9px;
+  border-right: 1px solid @line;
+  margin-right: 5px;
+}
+
+#mpris,
+#network,
+#pulseaudio,
+#backlight,
+#battery,
+#tray {
+  color: @ink;
+  padding: 0 7px;
+}
+
+#mpris {
+  color: @muted;
+}
+
+#battery.warning { color: #916c4e; }
+#battery.critical { color: #a95464; background: @rose; border-radius: 4px; }
+
+#tray { padding-right: 4px; }
+
+tooltip {
+  background: #fff6ef;
+  color: @ink;
+  border: 1px solid @line;
+  border-radius: 5px;
+}
+
+tooltip label { color: @ink; }
+
+/* Soft motion for the 2003 seaside theme. Keep movement within the bar. */
+@keyframes flower-breathe {
+  from { color: #9b738c; opacity: 0.78; }
+  50% { color: #bd6f79; opacity: 1; }
+  to { color: #9b738c; opacity: 0.78; }
+}
+
+@keyframes workspace-arrive {
+  from { background-color: #eee2b4; color: #8c7e8d; }
+  to { background-color: #dad5e7; color: #554c5d; }
+}
+
+@keyframes music-breathe {
+  from { background-color: transparent; color: #8c7e8d; }
+  50% { background-color: #eed2d0; color: #554c5d; }
+  to { background-color: transparent; color: #8c7e8d; }
+}
+
+@keyframes attention-pulse {
+  from { background-color: #eed2d0; color: #554c5d; }
+  50% { background-color: #bd6f79; color: #fff3ed; }
+  to { background-color: #eed2d0; color: #554c5d; }
+}
+
+#workspaces button,
+#custom-launcher,
+#mpris,
+#network,
+#pulseaudio,
+#backlight,
+#battery,
+#tray {
+  transition: background-color 180ms ease-out, color 180ms ease-out, opacity 180ms ease-out;
+}
+
+#custom-launcher {
+  animation: flower-breathe 3.8s ease-in-out infinite;
+}
+
+#custom-launcher:hover {
+  animation: none;
+}
+
+#workspaces button.focused {
+  animation: workspace-arrive 320ms ease-out;
+}
+
+#workspaces button.urgent {
+  animation: attention-pulse 1.4s ease-in-out infinite;
+}
+
+#mpris.playing {
+  border-radius: 4px;
+  animation: music-breathe 3s ease-in-out infinite;
+}
+
+#battery.critical {
+  animation: attention-pulse 1.4s ease-in-out infinite;
+}
+
+#mpris:hover,
+#network:hover,
+#pulseaudio:hover,
+#backlight:hover,
+#battery:not(.critical):hover,
+#tray:hover {
+  background-color: #eee2b4;
+  border-radius: 4px;
+}

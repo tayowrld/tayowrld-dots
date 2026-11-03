@@ -1,0 +1,6 @@
+# Seaside / Retro 2003 — portable Sway entry point.
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+include @CONFIG@/sway/modules/*.conf
+include @CONFIG@/sway/retro-2003/*.conf
+# Machine-specific settings are preserved by the installer.
+include @CONFIG@/sway/local.conf

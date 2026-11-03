@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+while IFS= read -r battery; do
+    upower -i "$battery" | grep -E 'energy:|energy-rate:|time to empty:' || true
+done < <(upower -e | grep '/battery_')

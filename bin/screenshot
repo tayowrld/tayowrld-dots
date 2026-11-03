@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+case ${1:-full} in
+ full) mode=output;; focused) mode=window;; zone) mode=region;; *) mode=$1;;
+esac
+exec "${XDG_CONFIG_HOME:-$HOME/.config}/sway/utils/screenshot.sh" "$mode"

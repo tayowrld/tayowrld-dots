@@ -1,0 +1,47 @@
+/* Seaside 2003: the same paper, rose and lilac palette as Sway/Waybar. */
+@define-color theme_bg_color #fff8f1;
+@define-color theme_fg_color #554c5d;
+@define-color theme_base_color #fffcf5;
+@define-color theme_text_color #554c5d;
+@define-color theme_selected_bg_color #957c9c;
+@define-color theme_selected_fg_color #fff8f1;
+@define-color borders #d7c4c2;
+@define-color theme_unfocused_bg_color #f5e8e2;
+
+.background, window, dialog { background-color: #fff8f1; color: #554c5d; }
+headerbar, .titlebar, toolbar, menubar {
+  background-color: #f5e8e2;
+  color: #554c5d;
+  border-color: #d7c4c2;
+  box-shadow: none;
+}
+button {
+  background-image: none;
+  background-color: #f5e8e2;
+  color: #554c5d;
+  border: 1px solid #cbbdc7;
+  border-radius: 4px;
+  box-shadow: none;
+}
+button:hover { background-color: #eed2d0; }
+button:active, button:checked, button.suggested-action {
+  background-color: #957c9c;
+  color: #fff8f1;
+}
+entry, spinbutton, textview, treeview.view, iconview.view, .view {
+  background-color: #fffcf5;
+  color: #554c5d;
+  border-color: #cbbdc7;
+}
+entry:focus, spinbutton:focus { border-color: #957c9c; }
+selection, *:selected { background-color: #dad5e7; color: #554c5d; }
+menu, menuitem, popover, tooltip {
+  background-color: #fff8f1;
+  color: #554c5d;
+  border-color: #d7c4c2;
+}
+menuitem:hover, modelbutton:hover { background-color: #eed2d0; }
+scrollbar slider { background-color: #cbbdc7; border-radius: 4px; }
+scrollbar slider:hover { background-color: #957c9c; }
+switch:checked { background-color: #957c9c; }
+notebook tab:checked { background-color: #fff8f1; color: #554c5d; }

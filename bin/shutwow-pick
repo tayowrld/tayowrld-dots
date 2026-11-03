@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# SHUTWOW-PICK - TUI tool to pick what you want to do
+# after pressing shutdown button
+
+sleep() {
+	gum confirm "(~.-.)~ Sleep tha mazafuka?" && systemctl suspend
+}
+shutdown() {
+	gum confirm "(~.-.)~ Shut tha mazafuka?" && systemctl poweroff
+}
+reboot() {
+	gum confirm "(~.-.)~ Reload tha mazafuka?" && systemctl reboot
+}
+exit_sway() {
+	gum confirm "(~.-.)~ Sway tha mazafuka?" && swaymsg exit
+}
+continue() {
+	exit 0
+}
+
+CHOICE=$(gum choose "(~-~) sleep" "(>o<)~ shutdown" "~(q-q) reboot" "(xox) exit sway")
+if [[ $CHOICE =~ "sleep" ]]; then
+	sleep
+elif [[ $CHOICE =~ "shutdown" ]]; then
+	shutdown
+elif [[ $CHOICE =~ "reboot" ]]; then
+	reboot
+elif [[ $CHOICE =~ "sway" ]]; then
+	exit_sway
+else 
+	continue
+fi

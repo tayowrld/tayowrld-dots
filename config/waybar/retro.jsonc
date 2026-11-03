@@ -1,0 +1,77 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 32,
+  "margin-top": 8,
+  "margin-left": 10,
+  "margin-right": 10,
+  "spacing": 0,
+  "reload_style_on_change": true,
+
+  "modules-left": ["clock", "sway/workspaces", "sway/window"],
+  "modules-right": ["mpris", "network", "pulseaudio", "backlight", "battery", "tray"],
+
+  "custom/launcher": {
+    "format": "✿",
+    "tooltip": "Applications",
+    "on-click": "fuzzel"
+  },
+  "sway/workspaces": {
+    "format": "{name}",
+    "warp-on-scroll": false,
+    "persistent-workspaces": {
+      "1": [], "2": [], "3": [], "4": [], "5": []
+    }
+  },
+  "sway/window": {
+    "format": "{title}",
+    "max-length": 28,
+    "tooltip": false,
+    "rewrite": {
+      "": "desktop",
+      "(.*) - Mozilla Firefox": "$1",
+      "(.*) — Mozilla Firefox": "$1"
+    }
+  },
+  "clock": {
+    "format": "{:%a  %d.%m  ·  %H:%M}",
+    "tooltip-format": "{:%A, %d %B %Y}"
+  },
+  "mpris": {
+    "format": "♪  {dynamic}",
+    "format-paused": "♫  {dynamic}",
+    "max-length": 22,
+    "tooltip": false
+  },
+  "network": {
+    "format-wifi": "Wi-Fi {signalStrength}%",
+    "format-ethernet": "LAN",
+    "format-disconnected": "offline",
+    "tooltip-format-wifi": "{essid} · {ipaddr}",
+    "interval": 15
+  },
+  "pulseaudio": {
+    "format": "VOL {volume}%",
+    "format-muted": "VOL ×",
+    "tooltip": false,
+    "scroll-step": 5,
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+  },
+  "backlight": {
+    "format": "LUX {percent}%",
+    "tooltip": false,
+    "scroll-step": 5
+  },
+  "battery": {
+    "format": "BAT {capacity}%",
+    "format-charging": "BAT ↑ {capacity}%",
+    "format-plugged": "BAT {capacity}%",
+    "format-critical": "BAT ! {capacity}%",
+    "states": { "warning": 20, "critical": 10 },
+    "interval": 30,
+    "tooltip-format": "{time} remaining"
+  },
+  "tray": {
+    "spacing": 6
+  }
+}

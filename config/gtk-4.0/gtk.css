@@ -1,0 +1,44 @@
+/* Seaside 2003 palette for GTK 4 apps. */
+@define-color window_bg_color #fff8f1;
+@define-color window_fg_color #554c5d;
+@define-color view_bg_color #fffcf5;
+@define-color view_fg_color #554c5d;
+@define-color accent_bg_color #957c9c;
+@define-color accent_fg_color #fff8f1;
+@define-color headerbar_bg_color #f5e8e2;
+@define-color headerbar_fg_color #554c5d;
+@define-color card_bg_color #fff6ef;
+@define-color borders #d7c4c2;
+
+window, dialog, .background { background-color: #fff8f1; color: #554c5d; }
+headerbar, .titlebar, toolbar, menubar {
+  background-color: #f5e8e2;
+  color: #554c5d;
+  border-color: #d7c4c2;
+  box-shadow: none;
+}
+button {
+  background-image: none;
+  background-color: #f5e8e2;
+  color: #554c5d;
+  border: 1px solid #cbbdc7;
+  border-radius: 4px;
+  box-shadow: none;
+}
+button:hover { background-color: #eed2d0; }
+button:active, button:checked, button.suggested-action {
+  background-color: #957c9c;
+  color: #fff8f1;
+}
+entry, spinbutton, textview, treeview.view, gridview.view, listview.view, .view {
+  background-color: #fffcf5;
+  color: #554c5d;
+  border-color: #cbbdc7;
+}
+entry:focus, spinbutton:focus { border-color: #957c9c; }
+selection, *:selected { background-color: #dad5e7; color: #554c5d; }
+popover, tooltip { background-color: #fff8f1; color: #554c5d; border-color: #d7c4c2; }
+modelbutton:hover { background-color: #eed2d0; }
+scrollbar slider { background-color: #cbbdc7; border-radius: 4px; }
+scrollbar slider:hover { background-color: #957c9c; }
+switch:checked { background-color: #957c9c; }

@@ -1,0 +1,13 @@
+[package]
+name = "tado"
+version = "0.3.0"
+edition = "2024"
+
+[profile.release]
+strip = "symbols"
+
+[dependencies]
+chrono = "0.4.45"
+clap = { version = "4.6.7", features = ["derive"] }
+clap_complete = { version = "4.6.11", features = ["unstable-dynamic"] }
+rusqlite = { version = "0.40.2", features = ["bundled", "chrono"] }
