@@ -27,7 +27,7 @@ fn here_exists_on_path(path: &PathBuf, keep_path: &mut PathBuf) -> bool {
         if path.as_ref().unwrap().file_name().display().to_string() == String::from(".here") {
             is_here_in = true;
             *keep_path = path.unwrap().path();
-        }    
+        }
     }
     is_here_in
 }
@@ -49,17 +49,17 @@ fn main() -> Result<(), Box<dyn Error>>{
     };
     let cli_path = Path::new(&bind_path);
     let is_path_ok = fs::exists(cli_path);
-    
+
 
     let mut here_exists:bool;
     if is_path_ok? {
         here_exists = here_exists_on_path(
-            &PathBuf::from(cli_path), 
+            &PathBuf::from(cli_path),
             &mut here_path
         );
     } else {
         here_exists = here_exists_on_path(
-            &get_current_directory_path()?, 
+            &get_current_directory_path()?,
             &mut here_path
         );
     }

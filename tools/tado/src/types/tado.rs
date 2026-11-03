@@ -10,4 +10,3 @@ pub(crate) struct Tado {
 pub(crate) struct App {
     pub(crate) todo: Vec<Tado>,
 }
-

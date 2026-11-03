@@ -28,6 +28,6 @@ elif [[ $CHOICE =~ "reboot" ]]; then
 	reboot
 elif [[ $CHOICE =~ "sway" ]]; then
 	exit_sway
-else 
+else
 	continue
 fi

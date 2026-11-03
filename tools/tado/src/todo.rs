@@ -9,4 +9,3 @@ pub fn parse_date(date: String) -> NaiveDate {
         &_ => date.parse::<NaiveDate>().expect("Not a date")
     }
 }
-

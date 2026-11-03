@@ -1,4 +1,4 @@
-use clap::{Parser,Subcommand}; 
+use clap::{Parser,Subcommand};
 
 #[derive(Parser)]
 pub(crate) struct Cli{
@@ -21,4 +21,3 @@ pub(crate) enum Action{
         index: usize,
     },
 }
-

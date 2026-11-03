@@ -29,8 +29,8 @@ fn add_todo_by_date(id: &u32, title: String, date: NaiveDate, db: &Connection) {
 }
 
 fn app_refresh(
-    app: &mut App, 
-    db: &Connection, 
+    app: &mut App,
+    db: &Connection,
     date: &NaiveDate
 ) -> Result<(), Box<dyn Error>>{
     app.todo = database::get_todo_by_date(db, date)?;
@@ -62,7 +62,7 @@ fn main() -> Result<(), Box<dyn Error>>{
             let new_id = database::new_id(&db)?;
             add_todo_by_date(
                 &new_id,
-                title, 
+                title,
                 date,
                 &db
             );
@@ -75,8 +75,8 @@ fn main() -> Result<(), Box<dyn Error>>{
         Action::Done { index } => {
             let item: &Tado = &tado_app.todo[index-1];
             let _ = database::mark_done(
-                item, 
-                &db, 
+                item,
+                &db,
             );
             let _ = app_refresh(&mut tado_app, &db, &date);
             print_todo_by_date(

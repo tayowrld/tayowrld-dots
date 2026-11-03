@@ -115,7 +115,8 @@ class Installer:
     def deploy(self,asahi,corners):
         for base,dest in ((ROOT/'config',self.config),(ROOT/'share',self.data),(ROOT/'bin',self.home/'.tayowrld-bin')):
             for src in sorted(base.rglob('*')):
-                if src.is_file(): self.copy(src,dest/src.relative_to(base))
+                if src.is_file() and '__pycache__' not in src.parts and src.suffix != '.pyc':
+                    self.copy(src,dest/src.relative_to(base))
         for src in (ROOT/'shell').iterdir(): self.copy(src,self.home/src.name)
         local=self.config/'sway/local.conf'
         if not local.exists():
