@@ -1,13 +1,13 @@
 # tayowrld dots · seaside 2003
 
-Тёплый светлый рабочий стол: море, пиксельные иконки, классические заголовки окон и сиреневый Bash prompt.
+A warm, light desktop with seaside wallpaper, pixel icons, classic window borders, and a lilac Bash prompt.
 
 ![Seaside desktop](screenshots/01-desktop.png)
 ![Seaside workspace](screenshots/02-workspace.png)
 
-## Установка
+## Installation
 
-На уже установленной Linux-системе, от обычного пользователя:
+Run as your desktop user on an existing Linux installation:
 
 ```bash
 git clone <your-repository-url> ~/.tayowrld-dots
@@ -16,20 +16,20 @@ cd ~/.tayowrld-dots
 ./install.sh
 ```
 
-Требуются Python 3, доступ к репозиториям дистрибутива и sudo для пакетов. Скрипт поддерживает Arch Linux / Arch Linux ARM и обычную Fedora / Fedora Asahi Remix на `x86_64` и `aarch64`. Atomic/OSTree и остальные дистрибутивы отклоняются до изменений. Сам Asahi, ядро, загрузчик и драйверы скрипт не устанавливает и не заменяет.
+Requires Python 3, access to your distribution's package repositories, and sudo for package installation. Supports Arch Linux / Arch Linux ARM and non-Atomic Fedora / Fedora Asahi Remix on `x86_64` and `aarch64`. Other distributions and Atomic/OSTree systems are rejected before changes are made. The installer does not install Asahi itself or replace kernels, bootloaders, or drivers.
 
-После установки выйдите из сеанса и выберите Sway. Уже установленный SwayFX сохраняется; переносимый профиль не требует FX-команд. В `examples/swayfx-effects.conf` сохранены настройки исходного сеанса; включайте их в `~/.config/sway/local.conf` только если ваша сборка их поддерживает. В исходной системе используется `animation_duration_ms`, доступный не во всех версиях SwayFX.
+Log out after installation and select Sway. An existing SwayFX installation is preserved; the portable configuration does not require FX commands. Original effects are saved in `examples/swayfx-effects.conf`. Enable them through `~/.config/sway/local.conf` only if your build supports them: `animation_duration_ms` is not available in every SwayFX version.
 
 ```bash
-./install.sh --no-packages     # зависимости уже установлены
-./install.sh --tools           # собрать here + tado из исходников, Cargo.lock фиксирует зависимости
-./install.sh --corners         # собрать GTK overlay скруглений; включается в новом Asahi local.conf
-./install.sh --xdg-only        # только нормализация XDG-каталогов
+./install.sh --no-packages     # dependencies are already installed
+./install.sh --tools           # build here and tado using their Cargo.lock files
+./install.sh --corners         # build the corner overlay; enabled in a new Asahi local.conf
+./install.sh --xdg-only        # normalize standard XDG directory names only
 ```
 
-`--tools` требует современный Rust с edition 2024 и доступ к crates.io. Готовые ARM-бинарники не распространяются. `here` необязателен: Bash работает и без него. `compress-web` использует отдельно установленный FFmpeg. Rust LSP в Neovim требует `rust-analyzer` и Neovim 0.11+.
+`--tools` requires Rust with edition 2024 support and access to crates.io. Architecture-specific binaries are not bundled. Bash works without the optional `here` helper. `compress-web` requires a separately installed FFmpeg. Rust LSP support requires `rust-analyzer` and Neovim 0.11 or newer.
 
-## Обновление и резервные копии
+## Updates and backups
 
 ```bash
 cd ~/.tayowrld-dots
@@ -37,13 +37,13 @@ git pull --ff-only
 ./install.sh
 ```
 
-Повторный запуск разворачивает текущую версию checkout; сам установщик не делает `git pull`. Неизменившиеся файлы не трогает. Изменённые конфиги, включая локальные правки, сначала копирует в `~/.local/state/tayowrld-dots/backups/<timestamp>/` с полным деревом исходных путей, затем заменяет. `~/.config/sway/local.conf` сохраняется всегда. Пакетный менеджер показывает транзакцию и запрашивает обычное подтверждение; полного обновления ОС скрипт не запускает.
+Each run deploys the current checkout; the installer does not pull changes itself. Unchanged files are left alone. Before replacing a changed file, including local edits, it saves a copy under `~/.local/state/tayowrld-dots/backups/<timestamp>/`, retaining the full original path. `~/.config/sway/local.conf` is always preserved. The package manager shows its transaction and requests its normal confirmation. The installer does not run a full system upgrade.
 
-Для восстановления отдельного файла скопируйте его из backup на исходное место. Установка заменяет файлы атомарно по одному, но не является транзакцией целиком: при сбое исправьте причину и запустите снова. Старые файлы, отсутствующие в новой версии репозитория, автоматически не удаляются. Пользовательские конфиги размещаются в HOME/XDG; `/etc/sway` и `/etc/xdg/waybar` остаются нетронутыми.
+Restore individual files by copying them from the backup to their original paths. File replacement is atomic per file, but the installation as a whole is not transactional: fix the cause of a failure and rerun the installer. Files removed from future repository versions are not automatically deleted from your system. Configuration is installed under HOME/XDG; `/etc/sway` and `/etc/xdg/waybar` are left untouched.
 
-## Каталоги
+## Directories
 
-| XDG | Имя для новой установки |
+| XDG directory | Fresh installation name |
 | --- | --- |
 | Desktop | `desk` |
 | Documents | `docs` |
@@ -53,35 +53,39 @@ git pull --ff-only
 | Music | `music` |
 | Pictures | `img` |
 | Videos | `video` |
-| Projects (пользовательский ключ) | `work` |
+| Projects (custom key) | `work` |
 
-Уже настроенные нестандартные пути сохраняются **буквально**, включая `internet/`, `music/`, `img/`, `video/`, `work/`, внешние диски и отключённые каталоги (`$HOME`). Стандартные английские имена переименовываются с содержимым; на старом месте остаётся совместимая относительная ссылка. Если новое имя уже занято или старое является ссылкой, скрипт ничего не объединяет и сохраняет старую настройку. Журнал перемещений: `~/.local/state/tayowrld-dots/directory-moves.jsonl`. Локализованные и другие нестандартные названия считаются пользовательскими и сохраняются.
+Existing custom paths are preserved **exactly**, including trailing slashes, external storage paths, and disabled directories pointing to `$HOME`. Standard English directory names are renamed together with their contents, leaving a relative compatibility symlink at the old location. If the destination already exists or the source is a symlink, the installer preserves the existing setting without merging directories.
 
-## Состав
+Moves are recorded in `~/.local/state/tayowrld-dots/directory-moves.jsonl`. Localized and other nonstandard names are treated as custom paths and preserved.
 
-- `config/sway`: клавиши, спиральная раскладка, REAPER popup helper, уведомления, обои, снимки экрана.
-- `config/waybar`: активная панель Retro; неиспользуемая старая конфигурация Hyprland не включена.
-- Alacritty, Fuzzel, Eza, Btop, Neovim, GTK 3/4, Kvantum, Qt6ct, KDE palette, portal и environment.d.
-- `shell`: пользовательский Bash; исправлена обработка путей с пробелами в `cd`.
-- `bin`: power menu, portable battery monitor, screenshot wrapper.
-- `tools`: исходники `here` и `tado`, без персональных `.here`, TODO-базы и скомпилированных бинарников.
-- `share`: Seaside-Pixel, pxsor и 3270 Nerd Font Mono.
+## Contents
 
-Обои и интерфейсные ресурсы взяты из текущей пользовательской темы. Истории shell, аккаунты приложений, браузерные профили, SSH-ключи и credentials не включены.
+- `config/sway`: keybindings, spiral layout, REAPER popup helper, notifications, wallpaper, and screenshots.
+- `config/waybar`: the active Retro panel configuration.
+- Alacritty, Fuzzel, Eza, Btop, Neovim, GTK 3/4, Kvantum, Qt6ct, KDE colors, desktop portals, and environment.d.
+- `shell`: the user's Bash setup, with quoted argument handling in `cd`.
+- `bin`: power menu, portable battery monitor, and screenshot wrapper.
+- `tools`: source code for `here` and `tado`, without personal `.here` files, the TODO database, or compiled binaries.
+- `share`: Seaside-Pixel, pxsor, and 3270 Nerd Font Mono.
 
-## Оборудование
+Assets come from the existing desktop theme. Shell history, application accounts, browser profiles, SSH keys, and credentials are excluded.
 
-По умолчанию используются родные режимы выходов, без привязки к монитору автора. На Apple Silicon автоматически создаётся `local.conf` с масштабом встроенного экрана 1.5 и UPower lid helper. Исходные настройки MacBook + ultrawide сохранены в `examples/original-macbook-outputs.conf` как пример, не применяются автоматически. Lid helper рассчитан на `eDP-1` и позиционирование `HDMI-A-1`; для другой разводки измените константы в `config/sway/utils/lid-upower.py`.
+## Hardware
 
-Для включения overlay после первой установки добавьте в `local.conf`:
+Native display modes are used by default. On Apple Silicon, a new `local.conf` sets the built-in display scale to 1.5 and starts the UPower lid helper. The original MacBook and ultrawide settings are retained in `examples/original-macbook-outputs.conf` as an example; they are not applied automatically.
+
+The lid helper assumes `eDP-1` and positions `HDMI-A-1`. Adjust the constants in `config/sway/utils/lid-upower.py` for different connector names.
+
+To enable the compiled corner overlay after the initial installation, add this to `local.conf`:
 
 ```text
 exec ~/.config/sway/utils/bottom-corners
 ```
 
-В репозитории пути `@HOME@` / `@CONFIG@` — шаблоны; установщик подставляет пути текущего пользователя. Домашние/XDG-пути с пробелами и метасимволами отклоняются явно.
+`@HOME@` and `@CONFIG@` are template placeholders replaced during installation. Home and XDG paths containing whitespace or shell metacharacters are explicitly rejected.
 
-## Проверка
+## Validation
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -89,12 +93,12 @@ python3 -m unittest discover -s tests -v
 sway -C -c ~/.config/sway/config
 ```
 
-Проверены повторная установка, backup локальных изменений, сохранение symlink-целей и пользовательских XDG, перенос Documents с данными и конфликт имён. Sway-конфиг проверен локально на Asahi ARM с SwayFX. Полная установка пакетов на чистых Fedora/x86_64 пока не проверена.
+Tests cover repeat installation, backups of local edits, symlink target preservation, custom XDG paths, Documents migration with data, directory conflicts, and platform detection. The Sway configuration was validated locally on Asahi ARM with SwayFX. The `here`, `tado`, and corner-overlay sources were built locally. Full package installation on clean Fedora and x86_64 systems has not been tested.
 
-Снимки — реальный пользовательский сеанс, Alacritty и Bash, отдельный временный workspace. Воспроизвести: `python3 scripts/screenshots.py` (требует запущенный Sway, grim и Alacritty).
+Screenshots show the real desktop session with Alacritty and the user's Bash on a temporary workspace. Reproduce them with `python3 scripts/screenshots.py` inside a running Sway session with grim and Alacritty installed.
 
-## Происхождение ресурсов
+## Attribution
 
-См. [ATTRIBUTION.md](ATTRIBUTION.md). Общая лицензия на сторонние ресурсы не переопределяется.
+See [ATTRIBUTION.md](ATTRIBUTION.md) for resource provenance and retained licenses. No blanket license overrides third-party resource terms.
 
-Проверка названий пакетов Fedora: [Qt6ct](https://packages.fedoraproject.org/pkgs/qt6ct/qt6ct/), [Kvantum](https://packages.fedoraproject.org/pkgs/kvantum/).
+Fedora package references: [Qt6ct](https://packages.fedoraproject.org/pkgs/qt6ct/qt6ct/), [Kvantum](https://packages.fedoraproject.org/pkgs/kvantum/).

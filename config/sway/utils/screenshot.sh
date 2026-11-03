@@ -39,4 +39,4 @@ case $mode in
 esac
 
 wl-copy --type image/png < "$file"
-notify-send -a Screenshot -i camera-photo 'Снимок сохранён' "$file"
+notify-send -a Screenshot -i camera-photo 'Screenshot saved' "$file"
