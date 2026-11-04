@@ -12,12 +12,14 @@ import shlex
 import shutil
 import subprocess
 import tempfile
+import tarfile
+import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMON = 'waybar alacritty fuzzel mako swaybg grim slurp wl-clipboard jq brightnessctl playerctl upower git eza btop neovim gum xdg-user-dirs qt6ct'.split()
 PACKAGES = {
-    'arch': COMMON + 'python python-dbus python-gobject gtk3 gtk-layer-shell pkgconf gcc fontconfig libnotify libpulse kvantum breeze-icons xdg-desktop-portal-wlr xdg-desktop-portal-gtk xorg-xwayland'.split(),
-    'fedora': COMMON + 'python3 python3-dbus python3-gobject gtk3-devel gtk-layer-shell-devel pkgconf-pkg-config gcc fontconfig libnotify pulseaudio-utils kvantum breeze-icon-theme xdg-desktop-portal-wlr xdg-desktop-portal-gtk xorg-x11-server-Xwayland'.split(),
+    'arch': COMMON + 'alsa-lib python python-dbus python-gobject gtk3 gtk-layer-shell pkgconf gcc fontconfig libnotify libpulse kvantum breeze-icons xdg-desktop-portal-wlr xdg-desktop-portal-gtk xorg-xwayland'.split(),
+    'fedora': COMMON + 'alsa-lib python3 python3-dbus python3-gobject gtk3-devel gtk-layer-shell-devel pkgconf-pkg-config gcc fontconfig libnotify pulseaudio-utils kvantum breeze-icon-theme xdg-desktop-portal-wlr xdg-desktop-portal-gtk xorg-x11-server-Xwayland'.split(),
 }
 DEFAULTS = {'DESKTOP':'desk', 'TEMPLATES':'templates', 'PUBLICSHARE':'public', 'DOCUMENTS':'docs',
             'DOWNLOAD':'internet', 'MUSIC':'music', 'PICTURES':'img', 'VIDEOS':'video', 'PROJECTS':'work'}
@@ -115,6 +117,7 @@ class Installer:
     def deploy(self,asahi,corners):
         for base,dest in ((ROOT/'config',self.config),(ROOT/'share',self.data),(ROOT/'bin',self.home/'.tayowrld-bin')):
             for src in sorted(base.rglob('*')):
+                if base==ROOT/'config' and src.relative_to(base).parts[0]=='REAPER': continue
                 if src.is_file() and '__pycache__' not in src.parts and src.suffix != '.pyc':
                     self.copy(src,dest/src.relative_to(base))
         for src in (ROOT/'shell').iterdir(): self.copy(src,self.home/src.name)
@@ -125,6 +128,7 @@ class Installer:
                 text+='output eDP-1 scale 1.5\nexec_always '+str(self.config)+'/sway/utils/lid.sh watch\n'
                 if corners: text+='exec '+str(self.config)+'/sway/utils/bottom-corners\n'
             self.put(local,text.encode())
+        self.reaper()
         self.xdg()
         self.state.mkdir(parents=True,exist_ok=True)
         manifest={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in
@@ -132,12 +136,84 @@ class Installer:
         self.put(self.state/'installed.json',(json.dumps(manifest,indent=2)+'\n').encode())
         print(f'Updated {len(self.records)} files. Backups (if needed): {self.backup}')
 
+    def reaper(self):
+        """Install theme only; merge the chosen theme into existing preferences."""
+        for src in sorted((ROOT/'config/REAPER').rglob('*')):
+            if src.is_file(): self.copy(src,self.config/'REAPER'/src.relative_to(ROOT/'config/REAPER'))
+        ini=self.config/'REAPER/reaper.ini'
+        text=ini.read_text() if ini.exists() else ''
+        lines=text.splitlines(keepends=True)
+        setting='lastthemefn5='+str(self.config/'REAPER/ColorThemes/OPENWRLD_Seaside_2003.ReaperThemeZip')+'\n'
+        section=None; found=False; out=[]; has_section=False
+        for line in lines:
+            if line.strip().startswith('['):
+                if section=='reaper' and not found: out.append(setting); found=True
+                section=line.strip()[1:-1].lower()
+                if section=='reaper': has_section=True
+            if section=='reaper' and line.startswith('lastthemefn5='):
+                out.append(setting); found=True
+            else: out.append(line)
+        if section=='reaper' and not found:
+            if out and not out[-1].endswith('\n'): out[-1]+='\n'
+            out.append(setting)
+        elif not has_section:
+            if out and not out[-1].endswith('\n'): out[-1]+='\n'
+            out.extend(['\n[reaper]\n',setting])
+        self.put(ini,''.join(out).encode())
+        # Same desktop ID as the upstream launcher, with our original pixel icon.
+        executable=shutil.which('reaper') or str(self.home/'.local/opt/REAPER/reaper')
+        desktop='[Desktop Entry]\nType=Application\nName=REAPER\nComment=OPENWRLD · Seaside 2003 studio\nExec="'+executable+'" %F\nIcon=reaper\nTerminal=false\nCategories=AudioVideo;Audio;Midi;Sequencer;\nStartupWMClass=REAPER\nMimeType=application/x-reaper-project;application/x-reaper-theme;\n'
+        self.put(self.data/'applications/cockos-reaper.desktop',desktop.encode())
+        icon=ROOT/'share/icons/Seaside-Pixel/scalable/apps/reaper.svg'
+        self.copy(icon,self.data/'icons/hicolor/scalable/apps/reaper.svg')
+
+
+def reaper_running(config):
+    # Ignore isolated -cfgfile preview instances in other resource directories.
+    for path in Path('/proc').glob('[0-9]*/cmdline'):
+        try:
+            if path.stat().st_uid!=os.getuid(): continue
+            args=path.read_bytes().decode(errors='replace').strip('\0').split('\0')
+            if not args or Path(args[0]).name!='reaper': continue
+            if '-cfgfile' in args:
+                index=args.index('-cfgfile')+1
+                if index<len(args) and Path(args[index]).resolve().parent!=(config/'REAPER').resolve(): continue
+            return True
+        except (OSError,ValueError): continue
+    return False
+
+
+def install_reaper(inst):
+    """Keep existing REAPER. Otherwise install official native Linux build in HOME."""
+    target=inst.home/'.local/opt/REAPER/reaper'
+    if shutil.which('reaper') or target.is_file():
+        print('REAPER already installed; keeping existing version.')
+        return
+    arch={'x86_64':'x86_64','aarch64':'aarch64','arm64':'aarch64'}[platform.machine()]
+    # Official stable release verified 2026-11-04. Updating is an explicit source change.
+    filename=f'reaper784_linux_{arch}.tar.xz'
+    url='https://www.reaper.fm/files/7.x/'+filename
+    with tempfile.TemporaryDirectory(prefix='dots-reaper-') as tmp:
+        archive=Path(tmp)/filename
+        print('Downloading official REAPER 7.84:',url,flush=True)
+        with urllib.request.urlopen(url,timeout=120) as response, archive.open('wb') as stream:
+            shutil.copyfileobj(response,stream)
+        hashes={'x86_64':'d87b39862bec6a82bbb530731ae1fa36bba4bc9954ff72518a187420eed9ec7d',
+                'aarch64':'3ade78689bec29315c1914e3a354b450f31b7fa46ef01cb438df6d3171a7a923'}
+        if hashlib.sha256(archive.read_bytes()).hexdigest()!=hashes[arch]:
+            raise RuntimeError('REAPER archive checksum mismatch')
+        with tarfile.open(archive) as bundle: bundle.extractall(tmp,filter='data')
+        source=Path(tmp)/f'reaper_linux_{arch}'
+        run(['sh',source/'install-reaper.sh','--install',inst.home/'.local/opt','--quiet'])
+    inst.put(inst.home/'.tayowrld-bin/reaper',('#!/bin/sh\nexec "'+str(target)+'" "$@"\n').encode(),0o755)
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check',action='store_true',help='compatibility and dependency plan, no changes')
     parser.add_argument('--no-packages',action='store_true',help='skip package installation')
     parser.add_argument('--tools',action='store_true',help='compile bundled here and tado with Cargo')
     parser.add_argument('--corners',action='store_true',help='compile MacBook corner overlay')
+    parser.add_argument('--reaper-only',action='store_true',help='install REAPER and studio theme only; preserve desktop config')
     parser.add_argument('--xdg-only',action='store_true',help='normalize only standard XDG directories')
     args=parser.parse_args()
     family,asahi=detect()
@@ -152,14 +228,27 @@ def main():
     print(f'Platform: {family}, {platform.machine()}, Asahi={asahi}')
     if args.check:
         print('Packages:', ' '.join(packages))
+        print('REAPER: keep existing version or install official 7.84 native build in ~/.local/opt; OPENWRLD theme enabled.')
         print('Profile: portable Sway; native display modes; optional local.conf overrides.')
         return
+    if not args.xdg_only and reaper_running(Path(os.environ.get('XDG_CONFIG_HOME',str(home/'.config')))):
+        raise RuntimeError('Close REAPER before installing so it cannot overwrite the selected theme.')
     inst=Installer(home)
     if args.xdg_only: inst.xdg(); print('XDG directories updated; backups:',inst.backup); return
+    if args.reaper_only:
+        if not args.no_packages: install_reaper(inst)
+        elif not (shutil.which('reaper') or (inst.home/'.local/opt/REAPER/reaper').is_file()):
+            raise RuntimeError('REAPER missing: rerun without --no-packages to install it.')
+        inst.reaper()
+        print('REAPER theme installed. Backups:',inst.backup)
+        return
     if not args.no_packages:
         manager='pacman' if family=='arch' else 'dnf'
         if not shutil.which(manager): raise RuntimeError(f'Missing {manager}')
         run(['sudo',manager]+(['-S','--needed'] if family=='arch' else ['install'])+packages)
+    if not args.no_packages: install_reaper(inst)
+    elif not (shutil.which('reaper') or (inst.home/'.local/opt/REAPER/reaper').is_file()):
+        raise RuntimeError('REAPER missing: rerun without --no-packages to install it.')
     needed=['sway','waybar','alacritty','fuzzel','mako','swaybg','grim','slurp','wl-copy','jq','eza','gum','xdg-user-dir']
     missing=[name for name in needed if not shutil.which(name)]
     if missing: raise RuntimeError('Missing required commands: '+', '.join(missing))

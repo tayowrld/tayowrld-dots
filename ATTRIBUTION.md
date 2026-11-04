@@ -8,3 +8,12 @@
 - **here / tado**: collected from the user's local Rust source directories; Cargo dependencies retain their respective licenses.
 
 No blanket license is applied to third-party artwork or fonts.
+
+- **OPENWRLD / Seaside 2003 REAPER theme**: original WALTER layout, generated PNG
+  controls, cassette SVG and pixel track artwork; source in
+  `scripts/build_reaper_theme.py`. Palette matches the existing Seaside desktop.
+  No Cockos Default theme images or layout code are included.
+- **REAPER application**: downloaded from Cockos only when absent, not bundled in
+  this repository. Proprietary software under its upstream evaluation/license
+  terms: https://www.reaper.fm/purchase.php . Version 7.84 and official SHA-256
+  values were verified at https://www.reaper.fm/download.php?hashes=1 .

@@ -29,6 +29,49 @@ Log out after installation and select Sway. An existing SwayFX installation is p
 
 `--tools` requires Rust with edition 2024 support and access to crates.io. Architecture-specific binaries are not bundled. Bash works without the optional `here` helper. `compress-web` requires a separately installed FFmpeg. Rust LSP support requires `rust-analyzer` and Neovim 0.11 or newer.
 
+## REAPER · OPENWRLD / Seaside 2003
+
+The normal installer now installs REAPER if missing and selects the bundled original
+`OPENWRLD_Seaside_2003.ReaperThemeZip`. Existing REAPER versions are preserved.
+Fresh installs use the official Linux 7.84 build for x86_64 or aarch64, with a pinned
+SHA-256 from [Cockos](https://www.reaper.fm/download.php?hashes=1), under
+`~/.local/opt/REAPER`. REAPER is proprietary; the installer does not supply a license.
+The `--no-packages` flag skips downloading REAPER too and requires it to be installed.
+
+To update only the studio (leave the rest of the desktop alone):
+
+```bash
+./install.sh --reaper-only
+./install.sh --reaper-only --no-packages  # use an existing REAPER installation
+```
+
+Close the main REAPER instance before installing. Independent `-cfgfile` preview
+instances are allowed. The installer merges only `lastthemefn5` in `reaper.ini`,
+backs up the previous file, and preserves audio/MIDI settings, plugin paths, recent
+projects, and licenses. REAPER-only mode assumes the desktop audio/GTK dependencies
+are already installed; use the normal installer on a fresh desktop.
+
+The studio uses the Sway/Waybar cream, lilac, dusty rose, sea-glass and ink palette,
+3270 Nerd Font Mono, original pixel buttons and segmented meters, a cassette app
+icon, and five track icons including an anime producer portrait. Linux native
+menus and dialogs are styled through `libSwell-user.colortheme`. DPI remains under
+REAPER/system control. Third-party plugin interfaces retain their own styling.
+
+Start an empty eight-track session with **File → Project templates → OPENWRLD_2003**.
+It has vocals, doubles, keys, bass, drums, lead, texture, and ending tracks at
+140 BPM, without media or plugin dependencies. Existing sessions are untouched.
+Track icons can also be assigned through the track icon menu under `OPENWRLD`.
+The heart on the transport is the repeat/loop button.
+
+Rebuild the theme with `python3 scripts/build_reaper_theme.py` (requires Pillow
+only for rebuilding; normal installation uses the packaged archive). All theme
+images, WALTER layout and pixel drawings are original and generated from this
+source; no bundled Default theme assets are redistributed. Switch themes through
+**Options → Themes**; restore `libSwell-user.colortheme` from the installation
+backup to revert native menu styling, then restart REAPER.
+
+![OPENWRLD studio](screenshots/03-reaper-openwrld.png)
+
 ## Updates and backups
 
 ```bash
